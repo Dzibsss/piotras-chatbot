@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #050505;
+  --foreground: #ffffff;
+  --accent-red: #ff0000;
+  --dark-red: #8b0000;
+}
+
+body {
+  color: var(--foreground);
+  background: #000000;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  background-image: linear-gradient(to bottom, #0a0a0a 0%, #000000 100%);
+}
+
+@layer components {
+  .aggressive-card {
+    background: #0a0a0a;
+    border: 2px solid #1a1a1a;
+    box-shadow: 4px 4px 0px 0px var(--accent-red);
+    transition: all 0.2s ease;
+  }
+
+  .aggressive-card:hover {
+    box-shadow: 6px 6px 0px 0px var(--accent-red);
+    transform: translate(-2px, -2px);
+  }
+
+  .aggressive-input {
+    background: #111;
+    border: 2px solid #1a1a1a;
+    color: white;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .aggressive-input:focus {
+    border-color: var(--accent-red);
+    outline: none;
+    box-shadow: 2px 2px 0px 0px var(--accent-red);
+  }
+
+  .aggressive-button {
+    background: var(--accent-red);
+    color: white;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border: 2px solid var(--accent-red);
+    transition: all 0.2s ease;
+  }
+
+  .aggressive-button:hover:not(:disabled) {
+    background: white;
+    color: black;
+    border-color: white;
+  }
+
+  .aggressive-button:active {
+    transform: translate(2px, 2px);
+  }
+}
+
+/* Custom Scrollbar - Raw & Dark */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #222;
+  border: 2px solid #000;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-red);
+}
