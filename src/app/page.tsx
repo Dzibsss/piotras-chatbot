@@ -22,7 +22,7 @@ export default function ChatPage() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Blokada DevTools i prawego kliku
+  // Blokada DevTools, prawego kliku i zoomowania
   useEffect(() => {
     const handleContextMenu = (e: MouseEvent) => e.preventDefault();
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -34,14 +34,44 @@ export default function ChatPage() {
       ) {
         e.preventDefault();
       }
+
+      // Blokada zoomu klawiszami (Ctrl + plus/minus/0)
+      if (e.ctrlKey && (e.key === '+' || e.key === '-' || e.key === '=' || e.key === '0')) {
+        e.preventDefault();
+      }
+    };
+
+    // Blokada zoomu kółkiem myszy (Ctrl + wheel)
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
+      }
+    };
+
+    // Blokada gestów (pinch-to-zoom) na touchpadach (Safari/Chrome)
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length > 1) {
+        e.preventDefault();
+      }
+    };
+
+    // Safari na macOS (pinch-to-zoom na trackpadzie)
+    const handleGestureStart = (e: any) => {
+      e.preventDefault();
     };
 
     document.addEventListener('contextmenu', handleContextMenu);
     document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('wheel', handleWheel, { passive: false });
+    document.addEventListener('touchstart', handleTouchStart, { passive: false });
+    document.addEventListener('gesturestart', handleGestureStart);
 
     return () => {
       document.removeEventListener('contextmenu', handleContextMenu);
       document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('wheel', handleWheel);
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('gesturestart', handleGestureStart);
     };
   }, []);
 
@@ -199,7 +229,7 @@ export default function ChatPage() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="CO TAM?"
-          className="flex-1 aggressive-input py-3 sm:py-5 px-4 sm:px-6 uppercase tracking-tighter text-xs sm:text-base"
+          className="flex-1 aggressive-input py-3 sm:py-5 px-4 sm:px-6 uppercase tracking-tighter text-base"
           disabled={isLoading}
         />
         <button
