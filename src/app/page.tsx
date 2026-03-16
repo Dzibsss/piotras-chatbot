@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Send, Music, User, Dumbbell, Trash2, Loader2 } from "lucide-react";
+import { Send, Music, User, UserRound, Trash2, Loader2 } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -22,10 +22,32 @@ export default function ChatPage() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Blokada DevTools i prawego kliku
+  useEffect(() => {
+    const handleContextMenu = (e: MouseEvent) => e.preventDefault();
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+      if (
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+        (e.ctrlKey && e.key === 'u')
+      ) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener('contextmenu', handleContextMenu);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('contextmenu', handleContextMenu);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   // Inteligentne przewijanie
   useEffect(() => {
     if (isLoading && scrollRef.current) {
-      // Przewijaj do dołu tylko gdy czekamy na odpowiedź (żeby widzieć loader)
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [isLoading]);
@@ -35,11 +57,8 @@ export default function ChatPage() {
     if (messages.length > 0) {
       const lastMessage = messages[messages.length - 1];
       if (lastMessage.role === "user" && scrollRef.current) {
-        // Po wysłaniu przez użytkownika - leć na dół
         scrollRef.current.scrollIntoView({ behavior: "smooth" });
       } 
-      // Gdy odpowiada asystent, NIE przewijamy automatycznie do samego dołu, 
-      // dzięki czemu użytkownik widzi początek nowej wiadomości.
     }
   }, [messages]);
 
@@ -85,35 +104,39 @@ export default function ChatPage() {
   };
 
   return (
-    <main className="flex flex-col h-screen w-full max-w-5xl mx-auto p-3 sm:p-4 md:p-6 lg:p-8">
-      {/* Centered Header - Responsive Font */}
-      <header className="mb-4 sm:mb-8 flex flex-col items-center justify-center animate-in fade-in slide-in-from-top duration-500">
+    <main className="flex flex-col h-screen w-full max-w-5xl mx-auto p-3 sm:p-4 md:p-6 lg:p-8 select-none">
+      {/* Centered Header */}
+      <header className="mb-6 sm:mb-10 flex flex-col items-center justify-center animate-in fade-in slide-in-from-top duration-500">
         <h1 className="text-[1.7rem] sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter uppercase italic border-b-4 sm:border-b-8 border-red-600 pb-1 sm:pb-2 text-center leading-tight">
-          Piotras - zmusi Cię do grania
+          Piotras - będziesz grał!
         </h1>
-        <button
-          onClick={clearChat}
-          className="mt-3 sm:mt-4 p-1.5 sm:p-2 hover:bg-red-600/20 rounded border border-transparent hover:border-red-600 transition-all text-red-600 font-bold flex items-center gap-2 text-[10px] sm:text-xs uppercase tracking-widest"
-          title="Wyczyść czat"
-        >
-          <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" /> WYCZYŚĆ HISTORIĘ
-        </button>
       </header>
 
-      {/* Chat Container - Aggressive Style */}
+      {/* Chat Container */}
       <div className="aggressive-card flex-1 overflow-hidden flex flex-col mb-4 sm:mb-6 relative">
+        {/* Discrete Clear Button - Top Right of Chat Box */}
+        {messages.length > 0 && (
+          <button
+            onClick={clearChat}
+            className="absolute top-2 right-2 z-10 p-1.5 text-zinc-800 hover:text-red-900 transition-colors opacity-30 hover:opacity-100"
+            title="Wyczyść historię"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
+
         <div 
           ref={containerRef}
           className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 space-y-6 sm:space-y-8 custom-scrollbar bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]"
         >
           {messages.length === 0 && !isLoading && (
             <div className="h-full flex flex-col items-center justify-center text-center space-y-4 sm:space-y-6 px-4">
-              <div className="p-4 sm:p-6 border-2 sm:border-4 border-red-600 rotate-3">
-                <Dumbbell className="w-10 h-10 sm:w-16 sm:h-16 text-red-600" />
+              <div className="p-4 sm:p-6 border-2 sm:border-4 border-red-600 rounded-full">
+                <UserRound className="w-10 h-10 sm:w-16 sm:h-16 text-red-600" />
               </div>
               <div className="space-y-1 sm:space-y-2">
-                <h2 className="text-xl sm:text-3xl font-black text-white uppercase italic">GRASZ COŚ CZY TYLKO MARUDZISZ?</h2>
-                <p className="text-gray-500 text-xs sm:text-base font-bold">PIOTRAS CZEKA. DO ROBOTY.</p>
+                <h2 className="text-xl sm:text-3xl font-black text-white uppercase italic tracking-tighter">GRASZ COŚ CZY TYLKO MARUDZISZ?</h2>
+                <p className="text-zinc-700 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em]">Piotras nie znosi lenistwa</p>
               </div>
             </div>
           )}
@@ -146,7 +169,7 @@ export default function ChatPage() {
                     : "bg-zinc-900 border-l-2 sm:border-l-4 border-red-600 text-red-50"
                 )}
               >
-                <div className="uppercase text-[8px] sm:text-[10px] mb-1 sm:mb-2 opacity-50 tracking-widest">
+                <div className="uppercase text-[8px] sm:text-[10px] mb-1 sm:mb-2 opacity-50 tracking-widest text-zinc-500">
                   {msg.role === "user" ? "TY" : "PIOTRAS"}
                 </div>
                 {msg.content}
@@ -169,13 +192,13 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* Input Area - Aggressive & Focused */}
+      {/* Input Area */}
       <form onSubmit={handleSubmit} className="relative flex gap-1 sm:gap-2">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="PISZ..."
+          placeholder="CO TAM?"
           className="flex-1 aggressive-input py-3 sm:py-5 px-4 sm:px-6 uppercase tracking-tighter text-xs sm:text-base"
           disabled={isLoading}
         />
@@ -188,9 +211,12 @@ export default function ChatPage() {
         </button>
       </form>
 
-      <footer className="mt-3 sm:mt-6 text-center">
-        <p className="text-[8px] sm:text-[10px] text-zinc-800 font-black uppercase tracking-tighter italic">
-          GOOGLE AI & NEXT.JS 15 // BRAK LIMITÓW // BRAK LITOŚCI
+      <footer className="mt-4 sm:mt-8 flex justify-between items-center opacity-20 hover:opacity-100 transition-opacity">
+        <p className="text-[7px] sm:text-[9px] text-zinc-800 font-black uppercase tracking-tighter italic">
+          GOOGLE AI // NEXT.JS 15 // NO LIMITS
+        </p>
+        <p className="text-[7px] sm:text-[9px] text-zinc-800 font-black uppercase tracking-tighter italic">
+          DESIGNED FOR PIOTRAS
         </p>
       </footer>
     </main>

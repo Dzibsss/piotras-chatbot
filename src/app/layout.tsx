@@ -5,8 +5,13 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Gemini Ultra Chat",
-  description: "Advanced AI Chatbot powered by Google Gemini 1.5 Flash",
+  title: "Piotras - będziesz grał!",
+  description: "Piotras (Piotr Dziadkowiec) - osiłek, który gra na fortepianie i zmusi Cię do ćwiczeń. Brak litości, tylko nuty.",
+  openGraph: {
+    title: "Piotras - będziesz grał!",
+    description: "Piotras (Piotr Dziadkowiec) - osiłek, który gra na fortepianie i zmusi Cię do ćwiczeń. Brak litości, tylko nuty.",
+    type: "website",
+  }
 };
 
 export default function RootLayout({
@@ -15,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="pl" className="dark">
       <body className={`${inter.className} overflow-hidden`}>
         {children}
       </body>
